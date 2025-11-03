@@ -1,3 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- css -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,300i,900,900i" rel="stylesheet">
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+  <title>Calendar</title>
+</head>
+<body>
+
 <script>
   // fill the month table with column headings
 function day_title(day_name) {
@@ -102,7 +117,7 @@ function fill_table(month, month_length, indexMonth) {
         </div>
         <span id="next" class="next fa fa-angle-right" aria-hidden="true"></span>
       </div>
-      <span class="c-paginator__year">2022</span>
+      <span class="c-paginator__year">2025</span>
     </div>
     <div class="c-sort">
       <a class="o-btn c-today__btn" href="javascript:;">TODAY</a>
@@ -123,7 +138,7 @@ function fill_table(month, month_length, indexMonth) {
       <script>
       
       // CAHNGE the below variable to the CURRENT YEAR
-      year = 2022;
+      year = new Date().getFullYear();
 
       // first day of the week of the new year
       today = new Date("January 1, " + year);
@@ -161,3 +176,9 @@ function fill_table(month, month_length, indexMonth) {
     <a href="javascript:;" class="o-btn js-event__save">SAVE <span class="fa fa-save"></span></a>
   </div>
 </div>
+
+<!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
