@@ -254,3 +254,90 @@ moveNext(indexMonth - 1, false);
 //fill the sidebar with current day
 $(".c-aside__num").text(day);
 $(".c-aside__month").text(monthText[month - 1]);
+
+
+// static/js/main.js
+
+// YYYY, MM을 얻는 헬퍼
+function getCurrentYearMonth() {
+  const y = document.querySelector(".c-paginator__year")?.textContent?.trim();
+  // 현재 보이는 month index를 계산하는 로직이 따로 있다면 거기에 맞춰 조정.
+  // 여기서는 실제 브라우저 날짜 기준으로 단순화:
+  const d = new Date();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const yyyy = y && /^\d{4}$/.test(y) ? y : String(d.getFullYear());
+  return { yyyy, mm };
+}
+
+// 셀에 이모지 렌더
+function renderEmoji(dateStr, emoji) {
+  const cell = document.querySelector(`.c-cal__cel[data-day='${dateStr}']`);
+  if (!cell) return;
+  // 이미 존재하면 교체
+  let badge = cell.querySelector(".emoji-badge");
+  if (!badge) {
+    badge = document.createElement("div");
+    badge.className = "emoji-badge";
+    badge.style.fontSize = "20px";
+    badge.style.position = "absolute";
+    badge.style.right = "6px";
+    badge.style.top = "6px";
+    cell.style.position = "relative";
+    cell.appendChild(badge);
+  }
+  badge.textContent = emoji;
+}
+
+// 월 데이터 불러오기
+async function fetchMonthEmotions(yyyy, mm) {
+  const res = await fetch(`/api/diary?year=${yyyy}&month=${mm}`);
+  const data = await res.json();
+  if (!data.ok) return;
+  data.items.forEach(item => {
+    renderEmoji(item.date, item.emoji);
+  });
+}
+
+// SAVE 버튼 연결
+document.addEventListener("DOMContentLoaded", () => {
+  const saveBtn = document.querySelector(".js-event__save");
+  const form = document.getElementById("addEvent");
+
+  if (saveBtn && form) {
+    saveBtn.addEventListener("click", async () => {
+      const date = form.elements["date"].value;   // YYYY-MM-DD
+      const notes = form.elements["notes"].value; // 일기 텍스트
+
+      if (!date) {
+        alert("날짜를 선택해 주세요.");
+        return;
+      }
+      if (!notes || !notes.trim()) {
+        alert("일기 내용을 입력해 주세요.");
+        return;
+      }
+
+      try {
+        const res = await fetch("/api/diary", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({ date, text: notes })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          renderEmoji(data.date, data.emoji);
+          alert(`Saved! ${data.label.toUpperCase()} ${data.emoji}`);
+        } else {
+          alert("Save failed: " + (data.error || "unknown"));
+        }
+      } catch (e) {
+        console.error(e);
+        alert("Network error");
+      }
+    });
+  }
+
+  // 초기 로드 시 현재 월 이모지 채우기
+  const { yyyy, mm } = getCurrentYearMonth();
+  fetchMonthEmotions(yyyy, mm);
+});

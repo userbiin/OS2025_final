@@ -48,13 +48,7 @@ function fill_table(month, month_length, indexMonth) {
     // fill the first week of days
     for (var i = start_day; i < 8; i++) {
       document.write(
-        "<div data-day='2022-" +
-          indexMonth +
-          "-0" +
-          day +
-          "'class='c-cal__cel'><p>" +
-          day +
-          "</p></div>"
+        `<div data-day='${year}-${indexMonth}-${dd}' class='c-cal__cel'><p>${day}</p></div>`
       );
       day++;
     }
@@ -64,16 +58,8 @@ function fill_table(month, month_length, indexMonth) {
     while (day <= month_length) {
       document.write("<div class='c-cal__row'>");
       for (var i = 1; i <= 7 && day <= month_length; i++) {
-        if (day >= 1 && day <= 9) {
-          document.write(
-            "<div data-day='2022-" +
-              indexMonth +
-              "-0" +
-              day +
-              "'class='c-cal__cel'><p>" +
-              day +
-              "</p></div>"
-          );
+        const dd = day < 10 ? '0${day}' : '${day}';
+        document.write(`<div data-day='${year}-${indexMonth}-${dd}' class='c-cal__cel'><p>${day}</p></div>`);
           day++;
         } else {
           document.write(
@@ -87,15 +73,14 @@ function fill_table(month, month_length, indexMonth) {
           );
           day++;
         }
+        document.write("</div>");
+        start_day = i;
       }
-      document.write("</div>");
-      // the first day of the next month
-      start_day = i;
-    }
-
-    document.write("</div>");
+      document.write("</div>")
   }
 </script>
+
+
 <header>
   <div class="wrapper">
     <div class="c-monthyear">
@@ -124,10 +109,13 @@ function fill_table(month, month_length, indexMonth) {
     </div>
   </div>
 </header>
+
+
+
 <div class="wrapper">
   <div class="c-calendar">
     <div class="c-calendar__style c-aside">
-      <a class="c-add o-btn js-event__add" href="javascript:;">add event <span class="fa fa-plus"></span></a>
+      <a class="c-add o-btn js-event__add" href="javascript:;">add Today's Diary <span class="fa fa-plus"></span></a>
       <div class="c-aside__day">
         <span class="c-aside__num"></span> <span class="c-aside__month"></span>
       </div>
