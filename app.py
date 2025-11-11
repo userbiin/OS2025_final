@@ -21,7 +21,7 @@ def init_db():
             )
         """)
 init_db()
-
+# 주석
 @app.route("/")
 def index():
     return render_template("index.html")
