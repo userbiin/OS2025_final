@@ -161,6 +161,18 @@ function fill_table(month, month_length, indexMonth) {
       fill_table("December", 31, "12");
       </script>
     </div>
+        <script>
+      const diaryChartUrl = "{{ url_for('diary_chart', date_str='DATE_PLACEHOLDER') }}";
+
+      $(document).ready(function() {
+        $('.c-cal__cel').click(function() {
+          const date = $(this).data('day');
+          if (!date) return;
+          const url = diaryChartUrl.replace('DATE_PLACEHOLDER', date);
+          window.location.href = url;
+        });
+      });
+    </script>
   </div>
 
   <div class="c-event__creator c-calendar__style js-event__creator">
