@@ -675,3 +675,26 @@ input {
 .c-detail__probs li {
   margin-bottom: 4px;
 }
+
+/* 파이차트 크기 */
+#emotionChart {
+  max-width: 500px;
+  max-height: 500px;
+}
+
+.c-detail__chart-wrap {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+    margin-top: 20px;
+}
+
+/* 오른쪽 텍스트 컬럼 */
+.c-detail__probs ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.c-detail__probs li {
+    margin-bottom: 6px;
+}

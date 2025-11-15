@@ -225,15 +225,10 @@ def diary_detail_page(date_str):
 
     # 3) detail.html 템플릿 렌더링
     return render_template("detail.html", diary=diary, empathy_msg=empathy_msg, display_day=display_day, display_month=display_month)
-    d, text, label, score, emoji, probs = row
-    return jsonify({
-        "ok": True,
-        "date": d, "text": text, "label": label, "score": score, "emoji": emoji,
-        "probs": json.loads(probs or "{}")
-    })
-@app.route("/diary_chart/<date_str>")
-def diary_chart(date_str):
 
-    return render_template("diary_chart.html", date_str=date_str)
+#@app.route("/diary_chart/<date_str>")
+#def diary_chart(date_str):
+
+#    return render_template("diary_chart.html", date_str=date_str)
 if __name__ == "__main__":
     app.run(debug=True)

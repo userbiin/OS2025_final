@@ -9,6 +9,8 @@
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <title>{{ diary.date }} 일기 상세 보기</title>
 </head>
 <body>
@@ -56,14 +58,17 @@
       <!-- 오른쪽 패널: 원그래프, 공감 멘트 -->
       <div class="c-cal__container c-calendar__style">
         <div class="c-detail__main">
-
-          <div class="c-detail__probs">
-            <h3>감정 분포 (파이차트로 들어갈 예정)</h3>
-            <ul>
-              {% for name, prob in diary.probs.items() %}
-                <li>{{ name }}: {{ "%.1f"|format(prob * 100) }}%</li>
-              {% endfor %}
-            </ul>
+          
+          <div class="c-detail__chart-wrap">
+            <div class="c-detail__probs">
+              <h3>감정들의 비율</h3>
+              <ul>
+                {% for name, prob in diary.probs.items() %}
+                  <li>{{ name }}: {{ "%.1f"|format(prob * 100) }}%</li>
+                {% endfor %}
+              </ul>
+            </div> 
+              <canvas id="emotionChart"></canvas>
           </div>
 
           {% if empathy_msg %}
@@ -76,5 +81,48 @@
       </div>            
     </div>
   </div>
+  <script>
+    (function () {
+      const probs = JSON.parse('{{ diary.probs | tojson | safe }}');
+
+      const labels = Object.keys(probs);
+      const values = Object.values(probs);
+
+      const ctx = document.getElementById('emotionChart').getContext('2d');
+
+      new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: values,
+            backgroundColor: [
+              '#FFD700', '#1E90FF', '#8A2BE2',
+              '#FF4500', '#32CD32', '#FF69B4', '#A9A9A9'
+            ],
+          }]
+        },
+        options: { responsive: true, plugins: {
+        legend: {
+            position: 'bottom',
+            labels: {
+                font: {
+                    size: 16   // 범례 글씨 크기
+                }
+            }
+        },
+
+        tooltip: {
+            bodyFont: {
+                size: 18   // ➜ 툴팁 본문 글씨 크기
+            },
+            titleFont: {
+                size: 20   // ➜ 툴팁 제목(감정 이름) 글씨 크기
+            }
+        }
+    } }
+      });
+    })();
+  </script>
 </body>
 </html>
