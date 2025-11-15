@@ -89,6 +89,9 @@ def get_diary(date_str):
         "date": d, "text": text, "label": label, "score": score, "emoji": emoji,
         "probs": json.loads(probs or "{}")
     })
+@app.route("/diary_chart/<date_str>")
+def diary_chart(date_str):
 
+    return render_template("diary_chart.html", date_str=date_str)
 if __name__ == "__main__":
     app.run(debug=True)
