@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,300i,900,900i" rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+
+    <title>{{ diary.date }} 일기 상세 보기</title>
+</head>
+<body>
+  <!-- 상단 헤더: 달력 헤더 스타일 재사용 -->
+  <header>
+    <div class="wrapper">
+      <div class="c-monthyear">
+        <div class="c-month">
+          <span class="c-paginator__month">DIARY DETAIL</span>
+        </div>
+        <span class="c-paginator__year">{{ diary.date }}</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- 메인 레이아웃: 달력과 동일한 .wrapper + .c-calendar 구조 -->
+  <div class="wrapper">
+    <div class="c-calendar">
+      <!-- 왼쪽 패널: 날짜 + 대표 감정 + 일기 -->
+      <div class="c-calendar__style c-aside">
+        <a href="/" class="c-add o-btn c-detail__back">
+          ← CALENDAR
+        </a>
+
+        <div class="c-detail__aside">
+          <div class="c-aside__day">
+            <span class="c-aside__num">{{ display_day }}</span>
+            <span class="c-aside__month">{{ display_month }}</span>
+          </div>
+
+          <div class="c-detail__emotion">
+            <span class="c-detail__emoji">{{ diary.emoji }}</span>
+            <span class="c-detail__label">{{ diary.label }}</span>
+          </div>
+
+          <h2 class="c-detail__title">오늘의 일기</h2>
+
+          <div class="c-detail__text">
+            {{ diary.text }}
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 오른쪽 패널: 원그래프, 공감 멘트 -->
+      <div class="c-cal__container c-calendar__style">
+        <div class="c-detail__main">
+
+          <div class="c-detail__probs">
+            <h3>감정 분포 (파이차트로 들어갈 예정)</h3>
+            <ul>
+              {% for name, prob in diary.probs.items() %}
+                <li>{{ name }}: {{ "%.1f"|format(prob * 100) }}%</li>
+              {% endfor %}
+            </ul>
+          </div>
+
+          {% if empathy_msg %}
+            <div class="c-detail__empathy">
+              {{ empathy_msg }}
+            </div>
+          {% endif %}
+
+        </div>
+      </div>            
+    </div>
+  </div>
+</body>
+</html>

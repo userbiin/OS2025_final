@@ -9,6 +9,7 @@
     const MONTH = now.getMonth() + 1; // 1~12
     const DAY = now.getDate();
     const TODAY = `${YEAR}-${pad2(MONTH)}-${pad2(DAY)}`;
+    let lastSavedDate = null;
     const yearLabel = document.querySelector(".c-paginator__year");
     if (yearLabel) yearLabel.textContent = String(YEAR);
 
@@ -165,6 +166,8 @@
             return alert("Save failed: " + (data.error || "unknown"));
           }
 
+          lastSavedDate = data.date;
+
           // 1) 이모지 배지 렌더
           renderEmoji(data.date, data.emoji);
 
@@ -194,6 +197,43 @@
         }
       });
     })();
+
+        // '상세 보기' 버튼 동작: 현재 선택된 날짜(달력) 기준으로 이동
+    (function bindDetailButton() {
+      const detailBtn = document.querySelector(".js-event__detail");
+      if (!detailBtn) return;
+
+      detailBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        let targetDate = "";
+
+        // 1순위: 달력에서 선택된 날짜(.isSelected)
+        const $selected = $(".c-cal__cel.isSelected");
+        if ($selected.length) {
+          targetDate = $selected.attr("data-day") || "";
+        }
+
+        // 2순위: 마지막으로 저장한 날짜
+        if (!targetDate && lastSavedDate) {
+          targetDate = lastSavedDate;
+        }
+
+        // 3순위: 그래도 없으면 오늘 날짜
+        if (!targetDate) {
+          targetDate = TODAY;
+        }
+
+        if (!targetDate) {
+          alert("상세 보기를 할 날짜를 찾을 수 없습니다.");
+          return;
+        }
+
+        window.location.href = "/diary/" + targetDate;
+      });
+    })();
+
+
 
     // 최초 월별 이모지 채우기
     (function initialMonthEmojis() {
