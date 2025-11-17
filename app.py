@@ -4,6 +4,7 @@ from datetime import datetime
 import random
 from services.emotion import predict_top
 
+
 app = Flask(__name__)
 
 DB_PATH = os.path.join("data", "diary.db")
@@ -131,10 +132,9 @@ def index():
 @app.post("/api/diary")
 def create_or_update_diary():
     data = request.get_json(force=True)
-    date_str = (data.get("date") or "").strip()       # "YYYY-MM-DD"
+    date_str = (data.get("date") or "").strip()
     text = (data.get("text") or "").strip()
 
-    # 날짜 검증
     try:
         _ = datetime.strptime(date_str, "%Y-%m-%d")
     except ValueError:
@@ -161,11 +161,11 @@ def create_or_update_diary():
 @app.get("/api/diary")
 def list_diary_month():
     year = request.args.get("year")
-    month = request.args.get("month")  # "01"~"12"
+    month = request.args.get("month")
     if not (year and month and len(year)==4 and len(month)==2):
         return jsonify({"ok": False, "error": "Query needs ?year=YYYY&month=MM"}), 400
 
-    prefix = f"{year}-{month}-"  # e.g., "2025-11-"
+    prefix = f"{year}-{month}-"
     with sqlite3.connect(DB_PATH) as con:
         cur = con.execute("SELECT date, emoji, label FROM diary WHERE date LIKE ?", (prefix+"%",))
         rows = cur.fetchall()

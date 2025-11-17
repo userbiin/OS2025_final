@@ -1,4 +1,3 @@
-// static/js/main.js
 (function ($) {
   $(function () {
     console.log("main.js loaded");
@@ -6,7 +5,7 @@
     const pad2 = (n) => String(n).padStart(2, "0");
     const now = new Date();
     const YEAR = now.getFullYear();
-    const MONTH = now.getMonth() + 1; // 1~12
+    const MONTH = now.getMonth() + 1;
     const DAY = now.getDate();
     const TODAY = `${YEAR}-${pad2(MONTH)}-${pad2(DAY)}`;
     let lastSavedDate = null;
@@ -50,7 +49,6 @@
       if (isBirthday)       return list.append(line("c-aside__event--birthday"));
       if (isFestivity)      return list.append(line("c-aside__event--festivity"));
       if (isEvent)          return list.append(line(""));
-      // 이벤트 없을 때는 비움
     }
 
     $(document).on("click", ".c-cal__cel", function () {
@@ -148,12 +146,12 @@
         e.preventDefault();
 
         const inputName  = form.elements["name"]?.value || "";
-        const inputDate  = form.elements["date"]?.value || "";   // YYYY-MM-DD
+        const inputDate  = form.elements["date"]?.value || "";
         const inputNotes = form.elements["notes"]?.value || "";
-        const inputTag   = form.elements["tags"]?.value || "";    // event/important/...
+        const inputTag   = form.elements["tags"]?.value || "";
 
-        if (!inputDate) return alert("날짜를 선택해 주세요.");
-        if (!inputNotes.trim()) return alert("일기 내용을 입력해 주세요.");
+        if (!inputDate) return alert("Select a Date.");
+        if (!inputNotes.trim()) return alert("Fill the content.");
 
         try {
           const res = await fetch("/api/diary", {
@@ -168,10 +166,8 @@
 
           lastSavedDate = data.date;
 
-          // 1) 이모지 배지 렌더
           renderEmoji(data.date, data.emoji);
 
-          // 2) 셀 메타 갱신(사이드바/스타일 위해)
           const $cell = $(`.c-cal__cel[data-day='${inputDate}']`);
           if ($cell.length) {
             if (inputName)  $cell.attr("data-name", inputName);
@@ -187,7 +183,6 @@
 
           alert(`Saved! ${data.label?.toUpperCase() || ""} ${data.emoji || ""}`);
 
-          // 닫기 & 초기화
           $winCreator.removeClass("isVisible");
           $("body").removeClass("overlay");
           form.reset();
@@ -235,7 +230,43 @@
 
 
 
-    // 최초 월별 이모지 채우기
+    (function bindDetailButton() {
+      const detailBtn = document.querySelector(".js-event__detail");
+      if (!detailBtn) return;
+
+      detailBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        let targetDate = "";
+
+        // 1순위: 달력에서 선택된 날짜(.isSelected)
+        const $selected = $(".c-cal__cel.isSelected");
+        if ($selected.length) {
+          targetDate = $selected.attr("data-day") || "";
+        }
+
+        // 2순위: 마지막으로 저장한 날짜
+        if (!targetDate && lastSavedDate) {
+          targetDate = lastSavedDate;
+        }
+
+        // 3순위: 그래도 없으면 오늘 날짜
+        if (!targetDate) {
+          targetDate = TODAY;
+        }
+
+        if (!targetDate) {
+          alert("상세 보기를 할 날짜를 찾을 수 없습니다.");
+          return;
+        }
+
+        window.location.href = "/diary/" + targetDate;
+      });
+    })();
+
+
+
+
     (function initialMonthEmojis() {
       const { yyyy, mm } = getCurrentYearMonth();
       fetchMonthEmotions(yyyy, mm);
@@ -257,15 +288,12 @@
       }
     }
 
-    // 날짜별 일기 상세 로드 + 사이드바/셀 메타 갱신
     async function loadDiary(dateStr) {
       try {
         const res = await fetch(`/api/diary/${dateStr}`);
         const data = await res.json();
 
-        // 일기가 없을 때(404) 처리
         if (!data.ok) {
-          // 사이드바 비우고 날짜만 표시
           $(".c-aside__event").remove();
           $(".c-aside__num").text(dateStr.slice(8));
           $(".c-aside__month").text(
@@ -274,7 +302,6 @@
           return;
         }
 
-        // 셀 메타 업데이트(페이지 새로고침 후에도 표시되도록)
         const $cell = $(`.c-cal__cel[data-day='${dateStr}']`);
         if ($cell.length) {
           $cell.attr("data-name", data.label || "Diary");
