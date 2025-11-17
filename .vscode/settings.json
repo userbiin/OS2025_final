@@ -1,5 +1,12 @@
 {
-    "python-envs.defaultEnvManager": "ms-python.python:conda",
+    "python-envs.defaultEnvManager": "ms-python.python:system",
     "python-envs.pythonProjects": [],
-    "python-envs.defaultPackageManager": "ms-python.python:conda"
+    "python-envs.defaultPackageManager": "ms-python.python:pip",
+    "python.excludedInterpreterPaths": [
+    "/opt/conda",
+    "/bin/python3",
+    "/usr/bin/python3",
+    "/home/codespace/.python"]
+
 }
+
