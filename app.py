@@ -227,19 +227,28 @@ def diary_detail_page(date_str):
     return render_template("detail.html", diary=diary, empathy_msg=empathy_msg, display_day=display_day, display_month=display_month)
 
 # diary delete
-@app.route("/diary/<date_str>", methods=["DELETE"])
-def delete_diary(date_str):
+@app.route("/api/diary/<date_str>", methods=["GET", "DELETE"])
+def diary_get_or_delete(date_str):
     try:
         _ = datetime.strptime(date_str, "%Y-%m-%d")
     except ValueError:
-        return jsonify({"ok": False, "error": "Invalid date format (YYYY-MM-DD)"}), 400
+        return jsonify({"ok": False, "error": "Invalid date format"}), 400
 
-    with sqlite3.connect(DB_PATH) as con:
-        cur = con.execute("DELETE FROM diary WHERE date=?", (date_str,))
-        if cur.rowcount == 0:
+    if request.method == "GET":
+        diary = fetch_diary(date_str)
+        if diary is None:
             return jsonify({"ok": False, "error": "No diary for date"}), 404
 
-    return jsonify({"ok": True, "date": date_str})
+        return jsonify({"ok": True, **diary})
+
+    elif request.method == "DELETE":
+        with sqlite3.connect(DB_PATH) as con:
+            cur = con.execute("DELETE FROM diary WHERE date=?", (date_str,))
+            if cur.rowcount == 0:
+                return jsonify({"ok": False, "error": "No diary for date"}), 404
+
+        return jsonify({"ok": True, "date": date_str})
+
 
 if __name__ == "__main__":
     app.run(debug=True)

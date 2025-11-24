@@ -124,8 +124,7 @@ function fill_table(month, month_length, indexMonth) {
     <div class="c-calendar__style c-aside">
       <a class="c-add o-btn js-event__add" href="javascript:;">add diary <span class="fa fa-plus"></span></a>
       <a class="o-btn js-event__detail" href="javascript:;">detail <span class="fa fa-eye"></span></a>
-      <button type="button" class="o-btn js-diary__delete">delete <span class="fa fa-minus"></span>
-</button>
+      <a class="o-btn js-diary__delete" style="margin-top: 3px;" href="javascript:;">delete <span class="fa fa-minus"></span></a>
 
       <div class="c-aside__day">
         <span class="c-aside__num"></span> <span class="c-aside__month"></span>
@@ -166,67 +165,6 @@ function fill_table(month, month_length, indexMonth) {
     <a href="javascript:;" class="o-btn js-event__save">SAVE <span class="fa fa-save"></span></a>
   </div>
 </div>
-
-<script>
-  // 현재 선택된 날짜를 저장할 변수
-  let selectedDate = null;
-
-  // 월 이름(영문) 배열: c-aside에 표시할 때 사용
-  const MONTH_NAMES = [
-    "JANUARY", "FEBRUARY", "MARCH", "APRIL",
-    "MAY", "JUNE", "JULY", "AUGUST",
-    "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"
-  ];
-
-  // 1) 달력 셀 클릭 시 해당 날짜를 선택
-  document.addEventListener("click", function (e) {
-    const cell = e.target.closest(".c-cal__cel");
-    if (!cell) return;  // 달력 셀이 아니면 무시
-
-    selectedDate = cell.dataset.day;  // 예: "2025-01-03"
-    if (!selectedDate) return;
-
-    // aside 날짜 표시 갱신
-    const [y, m, d] = selectedDate.split("-");
-    const numEl = document.querySelector(".c-aside__num");
-    const monthEl = document.querySelector(".c-aside__month");
-
-    if (numEl) numEl.textContent = d;
-    if (monthEl) monthEl.textContent = MONTH_NAMES[parseInt(m, 10) - 1] || "";
-
-    // 필요하면 여기에서 해당 날짜 일기 요약을 불러와 aside__eventList 갱신도 가능
-    // (선택 날짜 변경 시 자동으로 상세 info 표시)
-  });
-
-  // 2) delete 버튼 클릭 시 선택된 날짜의 일기를 삭제
-  document.addEventListener("click", function (e) {
-    const btn = e.target.closest(".js-diary__delete");
-    if (!btn) return;
-
-    const ok = confirm(selectedDate + " Do you want to delete this diary?");
-    if (!ok) return;
-
-    fetch("/api/diary/" + selectedDate, {
-      method: "DELETE"
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (!data.ok) {
-          alert(data.error || "error!");
-          return;
-        }
-        const cell = document.querySelector(".c-cal__cel[data-day='" + selectedDate + "']");
-        if (cell) {
-          cell.classList.remove("has-diary");
-        }
-
-        const eventList = document.querySelector(".c-aside__eventList");
-        if (eventList) eventList.innerHTML = "";
-
-        alert("Delete Success!");
-      })
-  });
-</script>
 
 </body>
 </html>
