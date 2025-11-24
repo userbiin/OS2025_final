@@ -193,7 +193,6 @@
       });
     })();
 
-        // '상세 보기' 버튼 동작: 현재 선택된 날짜(달력) 기준으로 이동
     (function bindDetailButton() {
       const detailBtn = document.querySelector(".js-event__detail");
       if (!detailBtn) return;
@@ -368,3 +367,110 @@
     moveNext(indexMonth - 1, false);
   });
 })(jQuery);
+
+document.addEventListener("DOMContentLoaded", () => {
+  // 선택된 날짜
+  let selectedDate = null;
+
+  const MONTH_NAMES = [
+    "JANUARY", "FEBRUARY", "MARCH", "APRIL",
+    "MAY", "JUNE", "JULY", "AUGUST",
+    "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"
+  ];
+
+  // 1) 날짜 셀 클릭 → 선택 날짜 저장 + 왼쪽 패널 날짜 표시
+  document.addEventListener("click", (e) => {
+    const cell = e.target.closest(".c-cal__cel");
+    if (!cell) return;
+
+    selectedDate = cell.dataset.day; // 예: "2025-01-03"
+    if (!selectedDate) return;
+
+    const [y, m, d] = selectedDate.split("-");
+    const numEl = document.querySelector(".c-aside__num");
+    const monthEl = document.querySelector(".c-aside__month");
+
+    if (numEl) numEl.textContent = d;
+    if (monthEl) monthEl.textContent = MONTH_NAMES[parseInt(m, 10) - 1] || "";
+  });
+
+  // 공통: "선택 날짜 없는 상태에서" 버튼 누를 때 경고용 함수
+  function ensureSelectedDate() {
+    if (!selectedDate) {
+      alert("먼저 캘린더에서 날짜를 클릭해 주세요.");
+      return false;
+    }
+    return true;
+  }
+
+  // 2) ADD DIARY 버튼: 일기 작성 창 열기 (기존 js-event__add 동작과 연결)
+  const addBtn = document.querySelector(".js-event__add");
+  if (addBtn) {
+    addBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (!ensureSelectedDate()) return;
+
+      // 선택된 날짜를 폼의 date input에도 채워주기
+      const dateInput = document.querySelector("form#addDiary input[name='date']");
+      if (dateInput) {
+        dateInput.value = selectedDate;
+      }
+
+      // 기존에 쓰던 작성 모달 열기 로직 (클래스 토글 방식이면 거기에 맞춰서)
+      const creator = document.querySelector(".js-event__creator");
+      if (creator) {
+        creator.classList.add("is-open"); // 템플릿에 맞게 클래스명 조정
+      }
+    });
+  }
+
+  // 3) DETAIL 버튼: /diary/<date> 페이지로 이동
+  const detailBtn = document.querySelector(".js-event__detail");
+  if (detailBtn) {
+    detailBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (!ensureSelectedDate()) return;
+
+      window.location.href = "/diary/" + selectedDate;
+    });
+  }
+
+  // 4) DELETE 버튼: DELETE /api/diary/<date> 호출
+  const deleteBtn = document.querySelector(".js-diary__delete");
+  if (deleteBtn) {
+    deleteBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (!ensureSelectedDate()) return;
+
+      if (!confirm(selectedDate + " 일기를 정말 삭제할까요?")) return;
+
+      fetch("/api/diary/" + selectedDate, {
+        method: "DELETE",
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (!data.ok) {
+            alert(data.error || "삭제 중 오류가 발생했습니다.");
+            return;
+          }
+
+          // 셀에서 표시 제거 (has-diary 같은 표시를 쓰고 있다면)
+          const cell = document.querySelector(
+            ".c-cal__cel[data-day='" + selectedDate + "']"
+          );
+          if (cell) {
+            cell.classList.remove("has-diary");
+          }
+
+          const eventList = document.querySelector(".c-aside__eventList");
+          if (eventList) eventList.innerHTML = "";
+
+          alert("일기가 삭제되었습니다.");
+        })
+        .catch((err) => {
+          console.error(err);
+          alert("네트워크 오류로 삭제에 실패했습니다.");
+        });
+    });
+  }
+});
