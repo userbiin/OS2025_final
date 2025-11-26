@@ -18,6 +18,7 @@ EMOJI_MAP = {
     "neutral": "😐",
 }
 
+# 텍스트의 감정을 분류, 이모지 반환
 def predict_top(text: str):
     """
     텍스트를 넣으면 (top_label, top_score, probs_dict, emoji) 반환

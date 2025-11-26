@@ -4,12 +4,14 @@ from datetime import datetime
 import random
 from services.emotion import predict_top
 
-
+# Flask 웹 서버 생성
 app = Flask(__name__)
 
 DB_PATH = os.path.join("data", "diary.db")
 os.makedirs("data", exist_ok=True)
 
+
+# 위로 멘트 리스트
 EMPATHY_MESSAGES = {
     "joy": [
         "오늘처럼 기쁜 하루를 보내신 당신께 축하드립니다! 그 기쁨이 내일도 이어지기를 응원합니다.",
@@ -83,6 +85,7 @@ EMPATHY_MESSAGES = {
     
 }
 
+# 일기장 테이블 생성 함수
 def init_db():
     with sqlite3.connect(DB_PATH) as con:
         con.execute("""
@@ -96,12 +99,8 @@ def init_db():
             )
         """)
 init_db()
-# 주석
 
-# 공용 함수 추가
-# DB 조회 코드를 함수로 빼두기
-# 같은 날 일기 조회 로직을 API 라우트와 HTML 렌더링 라우트에서 공유하기 위해서 작성.
-# 이렇게 해두면 나중에 컬럼 구조를 바꾸거나 로직을 바꿔도 한 군데만 고치면 됨.
+# 특정 날짜의 일기 데이터를 DB에서 불러와 일기 관련 내용들을 반환하는 함수
 def fetch_diary(date_str):
     """주어진 날짜의 일기 하나를 dict 형태로 반환. 없으면 None."""
     with sqlite3.connect(DB_PATH) as con:
@@ -125,10 +124,14 @@ def fetch_diary(date_str):
     }
 
 
+# 주소 접근 시 실행되는 함수들
+
+# 서버 최초 접속 시 index.html 파일 실행
 @app.route("/")
 def index():
     return render_template("index.html")
 
+# 일기 생성/수정
 @app.post("/api/diary")
 def create_or_update_diary():
     data = request.get_json(force=True)
@@ -158,6 +161,7 @@ def create_or_update_diary():
 
     return jsonify({"ok": True, "date": date_str, "label": label, "score": score, "emoji": emoji})
 
+# 일기 목록을 간단한 형태로 반환
 @app.get("/api/diary")
 def list_diary_month():
     year = request.args.get("year")
@@ -172,6 +176,7 @@ def list_diary_month():
     items = [{"date": d, "emoji": e, "label": l} for (d, e, l) in rows]
     return jsonify({"ok": True, "items": items})
 
+# 해당 날짜의 일기 데이터를 받아서 반환
 @app.get("/api/diary/<date_str>")
 def get_diary(date_str):
     try:
@@ -185,19 +190,7 @@ def get_diary(date_str):
 
     return jsonify({"ok": True, **diary})
 
-#    with sqlite3.connect(DB_PATH) as con:
-#        cur = con.execute("SELECT date, text, label, score, emoji, probs FROM diary WHERE date=?", (date_str,))
-#        row = cur.fetchone()
-#    if not row:
-#        return jsonify({"ok": False, "error": "No diary for date"}), 404
-
-#    d, text, label, score, emoji, probs = row
-#    return jsonify({
-#        "ok": True,
-#        "date": d, "text": text, "label": label, "score": score, "emoji": emoji,
-#        "probs": json.loads(probs or "{}")
-#    })
-
+# 일기 정보들을 웹 페이지에 보여주기
 @app.get("/diary/<date_str>")
 def diary_detail_page(date_str):
     """특정 날짜의 일기를 HTML 페이지로 보여주는 라우트"""
@@ -226,7 +219,7 @@ def diary_detail_page(date_str):
     # 3) detail.html 템플릿 렌더링
     return render_template("detail.html", diary=diary, empathy_msg=empathy_msg, display_day=display_day, display_month=display_month)
 
-# diary delete
+# 일기 삭제
 @app.route("/api/diary/<date_str>", methods=["GET", "DELETE"])
 def diary_get_or_delete(date_str):
     try:
@@ -249,6 +242,6 @@ def diary_get_or_delete(date_str):
 
         return jsonify({"ok": True, "date": date_str})
 
-
+# Flask 개발 서버를 실행
 if __name__ == "__main__":
     app.run(debug=True)
