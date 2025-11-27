@@ -65,7 +65,7 @@ body.overlay:before {
 /* 배경색 */
 html {
   height: 100%;
-  background: #eede91;
+  background: #E2DCF2;
   color: #ffffff;
   font-size: 13px;
   font-family: 'Lato', sans-serif;
@@ -120,7 +120,7 @@ header {
   height: 80px;
   width: 100%;
   z-index: 50;
-  background: #ab9d1c;
+  background: #8F88A6;
 }
 header > .wrapper {
   display: flex;
@@ -209,7 +209,7 @@ header > .wrapper a {
   width: 30px;
   height: 30px;
   padding: 9px 12px;
-  background-color: #010910;
+  background-color: #6d668d;
   cursor: pointer;
   z-index: 10;
   box-sizing: border-box;
@@ -287,7 +287,7 @@ header > .wrapper a {
 
 /* 메인 직사각형 색상 (좌우 동시 적용) */
 .c-calendar__style {
-  background-color: #af91b8;
+  background-color: #B4A9CF;
   margin: 20px;
   padding: 20px/2;
   box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.18);
@@ -380,7 +380,7 @@ header > .wrapper a {
   width: 40px;
   height: 40px;
   line-height: 40px;
-  background: #c05a2f;
+  background: #8579a3;
   transform: translate(-50%, -50%);
   -webkit-transform: translate(-50%, -50%);
   border-radius: 50%;
@@ -397,19 +397,19 @@ header > .wrapper a {
   background: rgba(215, 16, 15, 0.2);
 }
 .c-cal__cel:nth-child(7) p {
-  background: #574a2c;
+  background: #546990;
 }
 .c-cal__cel:hover {
-  background-color: #42464a !important;
+  background-color: #998eb8!important;
 }
 .c-cal__cel:hover p {
-  background: #003b71 !important;
+  background: #7c7098 !important;
 }
 .c-cal__cel.isSelected {
-  background-color: #42464a;
+  background-color: #998eb8;
 }
 .c-cal__cel.isSelected p {
-  background: #42464a;
+  background: #7c7098;
 }
 .c-cal__cel.isToday {
   background-color: rgba(245, 113, 112, 0.2);
