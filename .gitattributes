@@ -1,1 +1,2 @@
+*.safetensors filter=lfs diff=lfs merge=lfs -text
 finetuned_model_1202/model.safetensors filter=lfs diff=lfs merge=lfs -text
