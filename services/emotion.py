@@ -1,10 +1,22 @@
-from transformers import pipeline
+from transformers import pipeline, AutoTokenizer, AutoModelForSequenceClassification
+import torch
+
+
+FINETUNED_DIR = "finetuned_model_1202" 
+
+ft_tokenizer = AutoTokenizer.from_pretrained(FINETUNED_DIR)
+ft_model = AutoModelForSequenceClassification.from_pretrained(FINETUNED_DIR)
 
 _classifier = pipeline(
     "text-classification",
-    model="j-hartmann/emotion-english-distilroberta-base",
-    top_k=None
+    model=ft_model,
+    tokenizer=ft_tokenizer,
+    top_k=None,
+    device=-1,
 )
+
+device = "cpu"
+
 
 EMOJI_MAP = {
     "joy": "😄",
